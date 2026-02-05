@@ -1,2 +1,26 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Debug images produced during development
+debug_*.jpg
+debug_*.png
+debug_*.jpeg
+
+# macOS
+.DS_Store
+
+# Editor folders
+.vscode/
+.idea/
+
+# Compiled python files
+*.pyc
 venv/
 note
