@@ -14,6 +14,29 @@
       <div class="controls">
         <label>IP/URL Camera 1</label>
         <input type="text" id="src-1" placeholder="rtsp://..., http://..., /dev/video0" />
+        <label>Filter</label>
+        <select id="filter-1">
+          <option value="grayscale">Grayscale</option>
+          <option value="gaussian">Gaussian Blur</option>
+          <option value="median">Median Blur</option>
+          <option value="sobel">Sobel X</option>
+          <option value="laplacian">Laplacian</option>
+          <option value="sharpen">Sharpen</option>
+          <option value="bilateral">Bilateral</option>
+          <option value="threshold">Threshold (Binary)</option>
+          <option value="erode">Erode</option>
+          <option value="dilate">Dilate</option>
+        </select>
+        <div class="filter-param" id="filter-1-params" style="margin-top:8px; display:none;">
+          <div class="sharpen-param" style="display:none;">
+            <label for="filter-1-strength">Sharpen strength</label>
+            <input type="range" id="filter-1-strength" min="0" max="3" step="0.1" value="1.0" />
+          </div>
+          <div class="morph-param" style="display:none;">
+            <label for="filter-1-kernel">Morph kernel (odd)</label>
+            <input type="range" id="filter-1-kernel" min="1" max="31" step="2" value="3" />
+          </div>
+        </div>
         <button onclick="setSource(1)">Connect</button>
         <button onclick="stopSource(1)" class="stop">Stop</button>
       </div>
@@ -40,6 +63,29 @@
       <div class="controls">
         <label>IP/URL Camera 2</label>
         <input type="text" id="src-2" placeholder="rtsp://..., http://..., /dev/video1" />
+        <label>Filter</label>
+        <select id="filter-2">
+          <option value="grayscale">Grayscale</option>
+          <option value="gaussian">Gaussian Blur</option>
+          <option value="median">Median Blur</option>
+          <option value="sobel">Sobel X</option>
+          <option value="laplacian">Laplacian</option>
+          <option value="sharpen">Sharpen</option>
+          <option value="bilateral">Bilateral</option>
+          <option value="threshold">Threshold (Binary)</option>
+          <option value="erode">Erode</option>
+          <option value="dilate">Dilate</option>
+        </select>
+        <div class="filter-param" id="filter-2-params" style="margin-top:8px; display:none;">
+          <div class="sharpen-param" style="display:none;">
+            <label for="filter-2-strength">Sharpen strength</label>
+            <input type="range" id="filter-2-strength" min="0" max="3" step="0.1" value="1.0" />
+          </div>
+          <div class="morph-param" style="display:none;">
+            <label for="filter-2-kernel">Morph kernel (odd)</label>
+            <input type="range" id="filter-2-kernel" min="1" max="31" step="2" value="3" />
+          </div>
+        </div>
         <button onclick="setSource(2)">Connect</button>
         <button onclick="stopSource(2)" class="stop">Stop</button>
       </div>

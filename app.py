@@ -70,6 +70,14 @@ def capture():
     # payload: { cam_id: int }
     data = request.get_json()
     cam_id = int(data.get('cam_id'))
+    filter_name = data.get('filter', '').strip().lower()
+    filter_strength = float(data.get('filter_strength', 1.0))
+    # generic numeric parameter for filters (e.g., kernel size for morphology)
+    filter_param = data.get('filter_param', None)
+    try:
+        filter_param = int(filter_param) if filter_param is not None else None
+    except Exception:
+        filter_param = None
     if cam_id not in cameras:
         return jsonify({'ok': False, 'error': 'invalid cam_id'}), 400
     cam = cameras[cam_id]
@@ -85,8 +93,8 @@ def capture():
     b64 = base64.b64encode(raw).decode('utf-8')
     data_uri = 'data:image/jpeg;base64,' + b64
 
-    # Placeholder processing function: crop center square (you can replace)
-    processed, process_time_ms = process_image_placeholder(frame)
+    # Process with selected filter
+    processed, process_time_ms = process_image_placeholder(frame, filter_name, filter_strength, filter_param)
 
     ret2, jpg2 = cv2.imencode('.jpg', processed, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
     raw2 = jpg2.tobytes()
@@ -95,14 +103,15 @@ def capture():
 
     return jsonify({'ok': True, 'image': data_uri, 'processed': processed_uri, 'process_time_ms': round(process_time_ms, 2)})
 
-def process_image_placeholder(bgr_img):
+def process_image_placeholder(bgr_img, filter_name='', filter_strength=1.0, filter_param=None):
     """
     Placeholder image processing:
     - crop a center square at 50% of min(height,width)
     Replace this with your real processing.
     """
     print("Processing image placeholder...")
-    processed_frame, process_time_ms = ImageProcessor(bgr_img).process_frame(bgr_img)
+    # Use ImageProcessor pipeline and pass filter_name
+    processed_frame, process_time_ms = ImageProcessor(bgr_img).process_frame(bgr_img, filter_name=filter_name, filter_strength=filter_strength, filter_param=filter_param)
     return processed_frame, process_time_ms
 
 if __name__ == '__main__':

@@ -1,6 +1,11 @@
 async function setSource(cam_id){
   const vid = document.getElementById(`video-${cam_id}`);
   const src = document.getElementById(`src-${cam_id}`).value.trim();
+  const filter = document.getElementById(`filter-${cam_id}`) ? document.getElementById(`filter-${cam_id}`).value : '';
+  const strengthEl = document.getElementById(`filter-${cam_id}-strength`);
+  const filter_strength = strengthEl ? parseFloat(strengthEl.value) : 1.0;
+  const kernelEl = document.getElementById(`filter-${cam_id}-kernel`);
+  const filter_param = kernelEl ? parseInt(kernelEl.value) : null;
   if(!src){
     alert("Nhập IP/URL camera trước khi Connect (hoặc bấm Stop để dừng).");
     return;
@@ -8,7 +13,7 @@ async function setSource(cam_id){
   const res = await fetch('/set_source', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({cam_id: cam_id, source: src})
+    body: JSON.stringify({cam_id: cam_id, source: src, filter: filter, filter_strength: filter_strength, filter_param: filter_param})
   });
   const j = await res.json();
   if(!j.ok){
@@ -16,14 +21,14 @@ async function setSource(cam_id){
     return;
   }
   // reload the img to pick new stream (add cache buster)
-  vid.src = `/video_feed/${cam_id}?t=${Date.now()}`;
+  vid.src = `/video_feed/${cam_id}?t=${Date.now()}&filter=${encodeURIComponent(filter)}`;
 }
 
 async function stopSource(cam_id){
   const res = await fetch('/set_source', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({cam_id: cam_id, source: ''})
+    body: JSON.stringify({cam_id: cam_id, source: '', filter: ''})
   });
   const j = await res.json();
   if(!j.ok){
@@ -39,10 +44,15 @@ async function capture(cam_id){
   const btn = event.currentTarget;
   btn.disabled = true;
   try{
+    const filter = document.getElementById(`filter-${cam_id}`) ? document.getElementById(`filter-${cam_id}`).value : '';
+    const strengthEl = document.getElementById(`filter-${cam_id}-strength`);
+    const filter_strength = strengthEl ? parseFloat(strengthEl.value) : 1.0;
+    const kernelEl = document.getElementById(`filter-${cam_id}-kernel`);
+    const filter_param = kernelEl ? parseInt(kernelEl.value) : null;
     const res = await fetch('/capture', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({cam_id: cam_id})
+      body: JSON.stringify({cam_id: cam_id, filter: filter, filter_strength: filter_strength, filter_param: filter_param})
     });
     const j = await res.json();
     if(!j.ok){
@@ -63,6 +73,30 @@ async function capture(cam_id){
     btn.disabled = false;
   }
 }
+
+// Show/hide parameter controls depending on selected filter
+document.addEventListener('DOMContentLoaded', () => {
+  [1,2].forEach(id => {
+    const sel = document.getElementById(`filter-${id}`);
+    const params = document.getElementById(`filter-${id}-params`);
+    const onChange = () => {
+      if(!sel || !params) return;
+      const v = sel.value;
+      // show container when using sharpen or morphological filters
+      if(v === 'sharpen' || v === 'erode' || v === 'dilate'){
+        params.style.display = 'block';
+      } else {
+        params.style.display = 'none';
+      }
+      // show individual param controls
+      const sdiv = params.querySelector('.sharpen-param');
+      const mdiv = params.querySelector('.morph-param');
+      if(sdiv) sdiv.style.display = (v === 'sharpen') ? 'block' : 'none';
+      if(mdiv) mdiv.style.display = (v === 'erode' || v === 'dilate') ? 'block' : 'none';
+    };
+    if(sel){ sel.addEventListener('change', onChange); onChange(); }
+  });
+});
 
 // --- UI helpers ---
 // Static inline SVGs for gray placeholders.
